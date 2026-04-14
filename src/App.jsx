@@ -22,8 +22,9 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F8F6' }}>
-        <div className="w-8 h-8 border-3 border-[#FF4D00] border-t-transparent rounded-full animate-spin" />
+      <div className="loading">
+        <div className="spinner" />
+        Laden...
       </div>
     )
   }

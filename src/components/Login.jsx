@@ -1,108 +1,58 @@
-import { useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [input, setInput] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-
-    if (error) {
-      setError('Login fehlgeschlagen. Überprüfe deine Zugangsdaten.')
-      setLoading(false)
+  const handleLogin = async () => {
+    if (!input || !password) { setError('Bitte E-Mail und Passwort eingeben'); return; }
+    setError('');
+    setLoading(true);
+    try {
+      let email = input;
+      if (!input.includes('@')) {
+        const { data: prof } = await supabase.from('profiles').select('email,username').eq('username', input).maybeSingle();
+        if (prof && prof.email) { email = prof.email; }
+        else { email = input.replace(/[^a-zA-Z0-9._-]/g, '') + '@noreply.nowscale.ai'; }
+      }
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError) throw authError;
+    } catch (e) {
+      setError(e.message === 'Invalid login credentials' ? 'Ungueltige Anmeldedaten' : (e.message || 'Anmeldung fehlgeschlagen'));
     }
-  }
+    setLoading(false);
+  };
+
+  const handleKeyDown = (e) => { if (e.key === 'Enter') handleLogin(); };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#F8F8F6' }}>
-      <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#1A1A1A' }}>
-            NOWSCALE
-          </h1>
-          <div className="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: '#FF4D00', color: '#FFFFFF' }}>
-            Hub
-          </div>
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-logo">
+          <img src="https://nowscale.ai/Bilder/logo.png" alt="NowScale" />
+          <span>Hub</span>
         </div>
-
-        {/* Login Card */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm" style={{ border: '1px solid #E5E5E3' }}>
-          <h2 className="text-lg font-semibold mb-6 text-center" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#1A1A1A' }}>
-            Anmelden
-          </h2>
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: '#1A1A1A' }}>
-                E-Mail
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="simon@nowscale.ch"
-                required
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
-                style={{
-                  backgroundColor: '#F8F8F6',
-                  border: '1px solid #E5E5E3',
-                  color: '#1A1A1A',
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#FF4D00'}
-                onBlur={(e) => e.target.style.borderColor = '#E5E5E3'}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: '#1A1A1A' }}>
-                Passwort
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
-                style={{
-                  backgroundColor: '#F8F8F6',
-                  border: '1px solid #E5E5E3',
-                  color: '#1A1A1A',
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#FF4D00'}
-                onBlur={(e) => e.target.style.borderColor = '#E5E5E3'}
-              />
-            </div>
-
-            {error && (
-              <p className="text-sm text-red-500 text-center">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all cursor-pointer disabled:opacity-60"
-              style={{ backgroundColor: '#FF4D00' }}
-              onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#E64500')}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = '#FF4D00')}
-            >
-              {loading ? 'Wird angemeldet...' : 'Anmelden'}
-            </button>
-          </form>
+        <div className="login-title">Anmelden</div>
+        <div className="login-subtitle">Melden Sie sich mit Ihrem NowScale-Konto an</div>
+        {error && <div className="login-error">{error}</div>}
+        <div className="form-group">
+          <label className="form-label">E-Mail oder Benutzername</label>
+          <input className="form-input" type="text" placeholder="email@beispiel.ch oder benutzername"
+            value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} />
         </div>
-
-        <p className="text-center text-xs mt-6" style={{ color: '#999' }}>
-          © 2026 NOWSCALE™ · Interne Tools
-        </p>
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label className="form-label">Passwort</label>
+          <input className="form-input" type="password" placeholder="Passwort"
+            value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} />
+        </div>
+        <button className="btn btn-primary" style={{ width: '100%', marginTop: 20, padding: 10 }}
+          onClick={handleLogin} disabled={loading}>
+          {loading ? 'Anmelden...' : 'Anmelden'}
+        </button>
       </div>
     </div>
-  )
+  );
 }
