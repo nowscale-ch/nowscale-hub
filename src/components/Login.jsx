@@ -32,7 +32,7 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-logo">
-          <img src="https://nowscale.ai/Bilder/logo.png" alt="NowScale" />
+          <img src="/logo.webp" alt="NowScale" />
           <span>Hub</span>
         </div>
         <div className="login-title">Anmelden</div>

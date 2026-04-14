@@ -49,7 +49,7 @@ export default function Hub({ session }) {
       {/* Header */}
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src="https://nowscale.ai/Bilder/logo.png" alt="NowScale" style={{ height: 18 }} />
+          <img src="/logo.webp" alt="NowScale" style={{ height: 18 }} />
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Hub</span>
         </div>
         <div className="header-actions">
