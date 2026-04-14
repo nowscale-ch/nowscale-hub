@@ -1,4 +1,29 @@
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+
+function useTheme() {
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('ns-theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
+  const toggleTheme = useCallback(() => {
+    setIsDark(prev => {
+      const newDark = !prev;
+      const theme = newDark ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('ns-theme', theme);
+      return newDark;
+    });
+  }, []);
+
+  return { isDark, toggleTheme };
+}
 
 const tools = [
   {
@@ -39,6 +64,7 @@ const tools = [
 
 export default function Hub({ session }) {
   const email = session?.user?.email;
+  const { isDark, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -53,6 +79,13 @@ export default function Hub({ session }) {
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Hub</span>
         </div>
         <div className="header-actions">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 8 }}>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{isDark ? '🌙' : '☀️'}</span>
+            <label className="theme-toggle">
+              <input type="checkbox" checked={isDark} onChange={toggleTheme} />
+              <span className="theme-slider" />
+            </label>
+          </div>
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{email}</span>
           <button className="btn btn-ghost btn-sm" onClick={handleLogout}>Abmelden</button>
         </div>
