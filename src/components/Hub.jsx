@@ -30,8 +30,9 @@ const tools = [
     name: 'Lead Finder',
     url: 'https://leadfinder.nowscale.ai/',
     description: 'Leads finden, bewerten und kontaktieren',
+    color: '#F59E0B',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
@@ -41,8 +42,9 @@ const tools = [
     name: 'Ads Manager',
     url: 'https://ads.nowscale.ai/',
     description: 'Werbekampagnen verwalten und optimieren',
+    color: '#7C3AED',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" />
         <path d="M3 9h18" />
         <path d="M9 21V9" />
@@ -53,8 +55,9 @@ const tools = [
     name: 'Finance Planer',
     url: 'https://finance.nowscale.ai/',
     description: 'Finanzen, Fixkosten und Schulden im Blick',
+    color: '#2563EB',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="12" y1="1" x2="12" y2="23" />
         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
       </svg>
@@ -64,8 +67,9 @@ const tools = [
     name: 'Leads',
     url: 'https://leads.nowscale.ai/',
     description: 'Alle Anfragen zentral verwalten',
+    color: '#10B981',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -112,8 +116,8 @@ export default function Hub({ session }) {
         <div className="hub-section-label">Tools</div>
         <div className="hub-grid">
           {tools.map((tool) => (
-            <a key={tool.name} href={tool.url} target="_blank" rel="noopener noreferrer" className="hub-card">
-              <div className="hub-card-icon">
+            <a key={tool.name} href={tool.url} target="_blank" rel="noopener noreferrer" className="hub-card" style={{ borderTop: `3px solid ${tool.color}` }}>
+              <div className="hub-card-icon" style={{ background: `${tool.color}15` }}>
                 {tool.icon}
               </div>
               <h3>{tool.name}</h3>
