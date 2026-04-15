@@ -7,6 +7,7 @@ const TOOL_DEFS = [
   { key: 'ads', label: 'Ads Manager', color: '#7C3AED' },
   { key: 'finance', label: 'Finance', color: '#2563EB' },
   { key: 'leads', label: 'Leads', color: '#10B981' },
+  { key: 'projects', label: 'Projects', color: '#0EA5E9' },
 ];
 
 function useTheme() {
@@ -269,7 +270,7 @@ function UserModal({ user, onClose, onSaved, showToast, onResetPassword }) {
   const [email, setEmail] = useState(user?.email || '');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState(user?.role || 'user');
-  const [tools, setTools] = useState(user?.tools || ['leadfinder', 'ads', 'finance', 'leads']);
+  const [tools, setTools] = useState(user?.tools || ['leadfinder', 'ads', 'finance', 'leads', 'projects']);
   const [saving, setSaving] = useState(false);
 
   const toggleTool = (key) => {
@@ -290,12 +291,25 @@ function UserModal({ user, onClose, onSaved, showToast, onResetPassword }) {
 
     try {
       if (isEdit) {
-        // Update existing user
+        // Update ns_users
+        const updates = { name, role, tools, updated_at: new Date().toISOString() };
+        if (email.trim() !== user.email) updates.email = email.trim();
         const { error } = await supabase
           .from('ns_users')
-          .update({ name, role, tools, updated_at: new Date().toISOString() })
+          .update(updates)
           .eq('id', user.id);
         if (error) throw error;
+
+        // Update auth email if changed
+        if (email.trim() !== user.email && user.auth_id) {
+          await supabase.auth.updateUser({ email: email.trim() });
+        }
+
+        // Update password if provided
+        if (password.trim()) {
+          await supabase.auth.updateUser({ password: password.trim() });
+        }
+
         showToast('Benutzer aktualisiert');
       } else {
         // Create new user via signUp
@@ -338,18 +352,14 @@ function UserModal({ user, onClose, onSaved, showToast, onResetPassword }) {
           <input className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="Max Muster" />
         </div>
 
-        {!isEdit && (
-          <>
-            <div className="form-group">
-              <label className="form-label">E-Mail</label>
-              <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="max@beispiel.ch" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Passwort</label>
-              <input className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Mindestens 6 Zeichen" />
-            </div>
-          </>
-        )}
+        <div className="form-group">
+          <label className="form-label">E-Mail</label>
+          <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="max@beispiel.ch" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">{isEdit ? 'Neues Passwort (leer lassen = nicht ändern)' : 'Passwort'}</label>
+          <input className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={isEdit ? 'Neues Passwort eingeben...' : 'Mindestens 6 Zeichen'} />
+        </div>
 
         <div className="form-group">
           <label className="form-label">Rolle</label>
@@ -373,13 +383,7 @@ function UserModal({ user, onClose, onSaved, showToast, onResetPassword }) {
           </div>
         </div>
 
-        {isEdit && (
-          <div style={{ marginBottom: 16 }}>
-            <button className="btn btn-ghost btn-sm" onClick={() => onResetPassword(user.email)}>
-              🔑 Passwort zurücksetzen
-            </button>
-          </div>
-        )}
+
 
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 24 }}>
           <button className="btn btn-ghost" onClick={onClose}>Abbrechen</button>
