@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import { Link } from 'react-router-dom';
 
 function useTheme() {
   const [isDark, setIsDark] = useState(() => {
@@ -25,8 +26,9 @@ function useTheme() {
   return { isDark, toggleTheme };
 }
 
-const tools = [
+const allTools = [
   {
+    key: 'leadfinder',
     name: 'Lead Finder',
     url: 'https://leadfinder.nowscale.ai/',
     description: 'Leads finden, bewerten und kontaktieren',
@@ -39,6 +41,7 @@ const tools = [
     ),
   },
   {
+    key: 'ads',
     name: 'Ads Manager',
     url: 'https://ads.nowscale.ai/',
     description: 'Werbekampagnen verwalten und optimieren',
@@ -52,6 +55,7 @@ const tools = [
     ),
   },
   {
+    key: 'finance',
     name: 'Finance Planer',
     url: 'https://finance.nowscale.ai/',
     description: 'Finanzen, Fixkosten und Schulden im Blick',
@@ -64,6 +68,7 @@ const tools = [
     ),
   },
   {
+    key: 'leads',
     name: 'Leads',
     url: 'https://leads.nowscale.ai/',
     description: 'Alle Anfragen zentral verwalten',
@@ -81,7 +86,25 @@ const tools = [
 
 export default function Hub({ session }) {
   const email = session?.user?.email;
+  const authId = session?.user?.id;
   const { isDark, toggleTheme } = useTheme();
+  const [nsUser, setNsUser] = useState(null);
+
+  useEffect(() => {
+    if (!email) return;
+    supabase
+      .from('ns_users')
+      .select('*')
+      .eq('email', email)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setNsUser(data);
+      });
+  }, [email]);
+
+  const isAdmin = nsUser?.role === 'admin';
+  const userTools = isAdmin ? allTools : allTools.filter(t => (nsUser?.tools || []).includes(t.key));
+  const displayName = nsUser?.name?.split(' ')[0] || email?.split('@')[0] || 'User';
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -95,6 +118,12 @@ export default function Hub({ session }) {
           <img src="/logo.webp" alt="NowScale" style={{ height: 18 }} />
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Hub</span>
         </div>
+        {isAdmin && (
+          <nav className="hub-nav">
+            <Link to="/" className="hub-nav-link hub-nav-active">Tools</Link>
+            <Link to="/users" className="hub-nav-link">Benutzer</Link>
+          </nav>
+        )}
         <div className="header-actions">
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 8 }}>
             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{isDark ? '🌙' : '☀️'}</span>
@@ -110,12 +139,12 @@ export default function Hub({ session }) {
 
       {/* Content */}
       <div className="content" style={{ maxWidth: 960, margin: '0 auto', width: '100%', padding: '40px 32px' }}>
-        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Hallo, Simon</h2>
+        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Hallo, {displayName}</h2>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 32 }}>Wähle ein Tool, um loszulegen.</p>
 
         <div className="hub-section-label">Tools</div>
         <div className="hub-grid">
-          {tools.map((tool) => (
+          {userTools.map((tool) => (
             <a key={tool.name} href={tool.url} target="_blank" rel="noopener noreferrer" className="hub-card" style={{ borderTop: `3px solid ${tool.color}` }}>
               <div className="hub-card-icon" style={{ background: `${tool.color}15` }}>
                 {tool.icon}

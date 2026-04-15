@@ -18,8 +18,20 @@ export default function Login() {
         if (prof && prof.email) { email = prof.email; }
         else { email = input.replace(/[^a-zA-Z0-9._-]/g, '') + '@noreply.nowscale.ai'; }
       }
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) throw authError;
+
+      // Check if user is active in ns_users
+      const { data: nsUser } = await supabase
+        .from('ns_users')
+        .select('active')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (nsUser && nsUser.active === false) {
+        await supabase.auth.signOut();
+        throw new Error('Ihr Konto wurde deaktiviert. Kontaktieren Sie den Administrator.');
+      }
     } catch (e) {
       setError(e.message === 'Invalid login credentials' ? 'Ungueltige Anmeldedaten' : (e.message || 'Anmeldung fehlgeschlagen'));
     }

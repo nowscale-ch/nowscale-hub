@@ -144,8 +144,47 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 .toast-error { background: var(--danger); }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
 
+/* Hub Navigation */
+.hub-nav { display: flex; gap: 4px; margin-left: 16px; }
+.hub-nav-link { font-size: 13px; font-weight: 500; text-decoration: none; color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius); transition: all .15s; }
+.hub-nav-link:hover { color: var(--text); background: var(--bg); }
+.hub-nav-active { color: var(--primary) !important; background: var(--primary-light) !important; font-weight: 600; }
+
+/* User Management Table */
+.um-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--white); }
+.um-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.um-table thead { background: var(--bg); }
+.um-table th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+.um-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.um-table tr:last-child td { border-bottom: none; }
+
+/* User Management Badges */
+.um-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.um-badge-admin { background: #FFF7ED; color: #EA580C; border: 1px solid #FDBA7440; }
+.um-badge-user { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+[data-theme="dark"] .um-badge-admin { background: #431407; color: #FB923C; border-color: #9A340050; }
+[data-theme="dark"] .um-badge-user { background: var(--bg-dark); color: var(--text-muted); }
+
+.um-tool-badge { display: inline-block; padding: 1px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; border: 1px solid; }
+
+.um-status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.um-status-active { background: #10B981; }
+.um-status-inactive { background: #EF4444; }
+
+/* User Management Cards (mobile) */
+.um-cards { display: none; }
+.um-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+
+/* User Management Modal */
+.um-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+.um-modal { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+
 /* Responsive */
 @media (max-width: 768px) {
   .hub-grid { grid-template-columns: 1fr; }
   .page-header, .content { padding: 16px; }
+  .um-table-wrap { display: none; }
+  .um-cards { display: flex; flex-direction: column; gap: 12px; }
+  .hub-nav { margin-left: 8px; }
+  .header-actions .um-hide-mobile { display: none; }
 }
