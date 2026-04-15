@@ -103,7 +103,7 @@ export default function Hub({ session }) {
   }, [email]);
 
   const isAdmin = nsUser?.role === 'admin';
-  const userTools = isAdmin ? allTools : allTools.filter(t => (nsUser?.tools || []).includes(t.key));
+  const userTools = !nsUser ? allTools : isAdmin ? allTools : allTools.filter(t => (nsUser?.tools || []).includes(t.key));
   const displayName = nsUser?.name?.split(' ')[0] || email?.split('@')[0] || 'User';
 
   const handleLogout = async () => {
